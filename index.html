@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container my-4">
+    <h1>Book Database</h1>
+
+    <h2>GET Request</h2>
+
+    <button class="btn btn-primary my-4" id="getDataBtn">Get Data</button>
+
+    <ul class="list-group list-group-flush my-4" id="listData"></ul>
+
+    <h2>POST Request</h2>
+
+    <form id="bookEntryForm">
+
+      <label for="bookName">Book Name:</label><br>
+      <input class="form-control" id="bookName" />
+      <br><br>
+
+      <label for="bookAuthor">Author:</label><br>
+      <input class="form-control" id="bookAuthor" />
+      <br><br>
+
+      <button class="btn btn-success" type="submit">Submit</button>
+
+    </form>
+
+    <div class="my-4" id="bookContainer"></div>
+
+  </div>
+
+
+
+
+  <script>
+    const getDataBtn = document.querySelector("#getDataBtn")
+    const listData = document.querySelector("#listData")
+    const apiUrl = 'https://post-books-student-neog.replit.app/books'
+
+    getDataBtn.addEventListener("click", function () {
+      listData.innerHTML = " "
+      fetch(apiUrl)
+        .then(function (response) {
+          return response.json()
+        })
+        .then(function (data) {
+          for (let i = 0; i < data.length; i++) {
+            const listItem = document.createElement('li')
+
+            listItem.className = 'list-group-item'
+
+
+            listItem.innerHTML = `<h5>Book ID: ${data[i]._id}<br>${JSON.stringify(data[i])}`
+            listData.appendChild(listItem)
+          }
+        })
+    })
+
+    const bookEntryForm = document.querySelector("#bookEntryForm")
+    const bookName = document.querySelector("#bookName")
+    const bookAuthor = document.querySelector('#bookAuthor')
+    const bookContainer = document.querySelector("#bookContainer")
+
+    bookEntryForm.addEventListener("submit", function (event) {
+      event.preventDefault()
+
+      const responseData = {
+        bookName: bookName.value,
+        author: bookAuthor.value
+      }
+
+      fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(responseData),
+        headers: {
+          "content-type": "application/json"
+        }
+      })
+        .then(function (response) {
+          return response.json()
+        })
+        .then(function (data) {
+          if (data) {
+            bookContainer.textContent = JSON.stringify(data)
+          } else {
+            bookContainer.textContent = "Failed to Post book"
+          }
+        })
+        .catch(function (error) {
+          bookContainer.textContent = 'Something went wrong'
+        })
+
+    })
+
+
+  </script>
+
+</body>
+
+</html>
